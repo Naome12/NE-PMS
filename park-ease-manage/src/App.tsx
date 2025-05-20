@@ -18,6 +18,7 @@ import { CarEntryForm } from "@/components/Forms/CarEntryForm";
 import { CarExitForm } from "@/components/Forms/CarExitForm";
 import { EnteredCars } from "@/pages/EnteredCars";
 import { OutgoingCars } from "@/pages/OutgoingCars";
+import AddPark from "./pages/AddPark";
 
 const queryClient = new QueryClient();
 
@@ -82,7 +83,7 @@ const AppRoutes = () => (
       element={
         <RequireAuth>
           <RequireRole allowedRoles={["ADMIN"]}>
-            <ParkingForm />
+            <AddPark />
           </RequireRole>
         </RequireAuth>
       }

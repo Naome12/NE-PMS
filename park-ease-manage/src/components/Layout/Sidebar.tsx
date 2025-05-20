@@ -27,6 +27,7 @@ export const Sidebar = ({ open, setOpen }: SidebarProps) => {
     { name: "Dashboard", href: "/", icon: MapPin, allowedRoles: ["ADMIN"] },
     { name: "Parking", href: "/parks", icon: Car, allowedRoles: ["ADMIN","ATTENDANT"] },
     { name: "Book Ticket", href: "/book-space", icon: TicketPercent, allowedRoles: ["ATTENDANT"] },
+    { name: "Add Park", href: "/register-parking", icon: Car, allowedRoles: ["ADMIN"] },
     { name: "Entered Cars", href: "/entered-cars", icon: Car, allowedRoles: ["ADMIN"] },
     { name: "Outgoing", href: "/outgoing-cars", icon: Car, allowedRoles: ["ADMIN"] },
     { name: "Attendants", href: "/users", icon: Users, allowedRoles: ["ADMIN"] },
