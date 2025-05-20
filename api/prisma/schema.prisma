@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  ATTENDANT
+}
+
+enum ParkStatus {
+  OCCUPIED
+  FREE
+  RESERVED
+}
+
+enum ReportType {
+  ENTRIES
+  EXITS
+}
+
+model User {
+  id          String    @id @default(uuid())
+  firstName   String
+  lastName    String
+  email       String    @unique
+  password    String
+  role        Role
+  createdAt   DateTime  @default(now())
+
+  parks       Park[]    @relation("ParkOwner")
+  cars        Car[]     @relation("CarAttendant")
+  tickets     Ticket[]  @relation("TicketAttendant")
+  reports     Report[]  // 👈 New relation
+}
+
+model Park {
+  code            String     @id
+  name            String
+  availableSpaces Int
+  location        String
+  feePerHour      Decimal    @db.Decimal(10, 2)
+
+  status          ParkStatus @default(FREE)
+
+  ownerId         String
+  owner           User       @relation("ParkOwner", fields: [ownerId], references: [id])
+
+  cars            Car[]
+  tickets         Ticket[]
+}
+
+model Car {
+  id            String    @id @default(uuid())
+  plateNumber   String    @unique
+  parkingCode   String
+  entryTime     DateTime  @default(now())
+  exitTime      DateTime?
+  chargedAmount Decimal   @default(0.00) @db.Decimal(10, 2)
+
+  attendantId   String
+  attendant     User      @relation("CarAttendant", fields: [attendantId], references: [id])
+
+  park          Park      @relation(fields: [parkingCode], references: [code])
+
+  tickets       Ticket[]
+}
+
+model Ticket {
+  id           String    @id @default(uuid())
+  issueTime    DateTime  @default(now())
+
+  carId        String
+  car          Car       @relation(fields: [carId], references: [id])
+
+  parkingCode  String
+  park         Park      @relation(fields: [parkingCode], references: [code])
+
+  attendantId  String
+  attendant    User      @relation("TicketAttendant", fields: [attendantId], references: [id])
+}
+
+model Report {
+  id             String      @id @default(uuid())
+  generatedAt    DateTime    @default(now())
+
+  startRange     DateTime
+  endRange       DateTime
+  type           ReportType
+
+  totalCars      Int
+  totalCharged   Decimal     @default(0.00) @db.Decimal(10,2)
+
+  generatedById  String
+  generatedBy    User        @relation(fields: [generatedById], references: [id])
+}
