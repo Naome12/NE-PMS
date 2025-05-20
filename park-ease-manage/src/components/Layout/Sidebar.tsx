@@ -20,7 +20,7 @@ interface SidebarProps {
 
 export const Sidebar = ({ open, setOpen }: SidebarProps) => {
   const { logout } = useAuth();
-  const { currentUser } = useParkingContext();
+  const { currentUser } = useAuth();
   const role = currentUser?.role || "ATTENDANT";
 
   const navigationItems = [

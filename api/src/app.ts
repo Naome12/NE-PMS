@@ -12,10 +12,11 @@ dotenv.config();
 const app = express();
 
 
-    app.use(cors({
-    origin: 'http://localhost:8080',
-    credentials: true,
-    }));
+app.use(cors({
+  origin: ['http://localhost:8080', 'http://localhost:4000'],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Swagger Documentation

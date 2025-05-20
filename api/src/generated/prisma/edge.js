@@ -189,7 +189,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\admin\\Documents\\NE 2025\\RESTFUL\\PMS\\api\\src\\generated\\prisma",
+      "value": "D:\\rest\\NE-PMS\\api\\src\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -203,7 +203,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\admin\\Documents\\NE 2025\\RESTFUL\\PMS\\api\\prisma\\schema.prisma",
+    "sourceFilePath": "D:\\rest\\NE-PMS\\api\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -217,7 +217,6 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

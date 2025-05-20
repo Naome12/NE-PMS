@@ -1,87 +1,20 @@
-import { useEffect, useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { toast } from "sonner";
-import api from "@/lib/lib";
 
-interface Car {
-  id: string;
-  plateNumber: string;
-  parkingCode: string;
-  entryTime: string;
-  parkingName: string;
-  location: string;
-}
+import { MainLayout } from '@/components/Layout/MainLayout';
+import { CarEntryForm } from '@/components/Forms/CarEntryForm';
 
 export const EnteredCars = () => {
-  const [cars, setCars] = useState<Car[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchCars = async () => {
-    try {
-      const response = await api.get("/car/entered");
-      setCars(response.data.data);
-    } catch (error) {
-      toast.error("Failed to fetch entered cars");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCars();
-  }, []);
-
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Currently Parked Cars</CardTitle>
-        <CardDescription>View all cars currently in the parking</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <div className="text-center py-4">Loading...</div>
-        ) : cars.length === 0 ? (
-          <div className="text-center py-4">No cars currently parked</div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>License Plate</TableHead>
-                <TableHead>Parking Spot</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Entry Time</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {cars.map((car) => (
-                <TableRow key={car.id}>
-                  <TableCell>{car.plateNumber}</TableCell>
-                  <TableCell>{car.parkingName}</TableCell>
-                  <TableCell>{car.location}</TableCell>
-                  <TableCell>
-                    {new Date(car.entryTime).toLocaleString()}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
-    </Card>
+    <MainLayout>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight">Car Entry</h1>
+        <p className="text-muted-foreground">Monitor your parking lot in real-time.</p>
+      </div>
+      
+      <div className="space-y-8">
+        <CarEntryForm/>
+      </div>
+    </MainLayout>
   );
-}; 
+};
+
+export default EnteredCars;

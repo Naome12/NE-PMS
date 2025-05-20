@@ -11,7 +11,7 @@ interface TopNavProps {
 }
 
 export const TopNav = ({ sidebarOpen, setSidebarOpen }: TopNavProps) => {
-  const { currentUser } = useParkingContext();
+  const { currentUser } = useAuth();
   const { logout } = useAuth();
   
   return (
