@@ -1,4 +1,4 @@
-// src/pages/AdminDashboard.tsx
+// src/pages/Attendant.tsx
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useParkingContext } from '@/context/ParkingContext';
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 
 const PAGE_SIZE = 5;
 
-const AdminDashboard = () => {
+const Attendant = () => {
   const { parks, refreshParks } = useParkingContext();
   const [users, setUsers] = useState<User[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,4 +83,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default Attendant;

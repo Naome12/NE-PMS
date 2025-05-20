@@ -50,12 +50,6 @@ const AdminDashboard = () => {
           <p className="text-xs text-muted-foreground">
             {freeSpots} FREE, {occupiedSpots} OCCUPIED, {reservedSpots} RESERVED
           </p>
-          <div className="mt-4 h-1 w-full bg-gray-200 rounded-full">
-            <div
-              className="h-1 bg-secondary rounded-full"
-              style={{ width: `${occupancyRate}%` }}
-            ></div>
-          </div>
           <p className="mt-1 text-xs text-muted-foreground">{occupancyRate}% occupancy rate</p>
         </CardContent>
       </Card>
