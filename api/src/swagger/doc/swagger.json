@@ -17,8 +17,12 @@
       "description": "Authentication endpoints"
     },
     {
-      "name": "Parking Spots",
-      "description": "Parking Spots endpoints"
+      "name": "Spots",
+      "description": "Parking spots management"
+    },
+    {
+      "name": "Cars Entry/Exit",
+      "description": "Vehicle entry and exit management"
     }
   ],
   "components": {
@@ -106,28 +110,6 @@
           "chargedAmount": {
             "type": "number",
             "format": "float"
-          }
-        }
-      },
-      "Ticket": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "issueTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "carId": {
-            "type": "string"
-          },
-          "parkingCode": {
-            "type": "string"
-          },
-          "attendantId": {
-            "type": "string"
           }
         }
       }
@@ -242,7 +224,7 @@
     },
     "/park": {
       "post": {
-        "tags": ["Parking Spots"],
+        "tags": ["Spots"],
         "summary": "Register new parking spot",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
@@ -281,7 +263,7 @@
         }
       },
       "get": {
-        "tags": ["Parking Spots"],
+        "tags": ["Spots"],
         "summary": "Get all parking spots",
         "security": [{ "bearerAuth": [] }],
         "responses": {
@@ -303,7 +285,7 @@
     },
     "/park/available": {
       "get": {
-        "tags": ["Parking Spots"],
+        "tags": ["Spots"],
         "summary": "Get available parking spots",
         "security": [{ "bearerAuth": [] }],
         "responses": {
@@ -325,7 +307,7 @@
     },
     "/car/register": {
       "post": {
-        "tags": ["Vehicle check-in/check-out"],
+        "tags": ["Cars Entry/Exit"],
         "summary": "Register car entry",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
@@ -356,7 +338,7 @@
     },
     "/car/exit": {
       "post": {
-        "tags": ["Vehicle check-in/check-out"],
+        "tags": ["Cars Entry/Exit"],
         "summary": "Register car exit",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
@@ -400,7 +382,7 @@
     },
     "/car/entered": {
       "get": {
-        "tags": ["Vehicle check-in/check-out"],
+        "tags": ["Cars Entry/Exit"],
         "summary": "Get entered cars report",
         "security": [{ "bearerAuth": [] }],
         "responses": {
@@ -422,7 +404,7 @@
     },
     "/car/outgoing": {
       "get": {
-        "tags": ["Vehicle check-in/check-out"],
+        "tags": ["Cars Entry/Exit"],
         "summary": "Get outgoing cars report",
         "security": [{ "bearerAuth": [] }],
         "responses": {
@@ -434,59 +416,6 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/Car"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ticket/book": {
-      "post": {
-        "tags": ["Tickets"],
-        "summary": "Book a parking ticket",
-        "security": [{ "bearerAuth": [] }],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["carId", "parkingCode"],
-                "properties": {
-                  "carId": {
-                    "type": "string"
-                  },
-                  "parkingCode": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Ticket booked successfully"
-          }
-        }
-      }
-    },
-    "/ticket": {
-      "get": {
-        "tags": ["Tickets"],
-        "summary": "Get all tickets",
-        "security": [{ "bearerAuth": [] }],
-        "responses": {
-          "200": {
-            "description": "List of tickets",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Ticket"
                   }
                 }
               }

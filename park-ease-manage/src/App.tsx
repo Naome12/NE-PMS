@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
@@ -11,11 +11,13 @@ import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import Dashboard from "@/pages/Dashboard";
 import Parks from "@/pages/ParkingSpots";
-// import BookTicket from "@/pages/BookTicket";
-// import EnteredCars from "@/pages/EnteredCars";
-// import OutgoingCars from "@/pages/OutgoingCars";
 import Users from "@/pages/Users";
 import NotFound from "@/pages/NotFound";
+import { ParkingForm } from "@/components/Forms/ParkingForm";
+import { CarEntryForm } from "@/components/Forms/CarEntryForm";
+import { CarExitForm } from "@/components/Forms/CarExitForm";
+import { EnteredCars } from "@/pages/EnteredCars";
+import { OutgoingCars } from "@/pages/OutgoingCars";
 
 const queryClient = new QueryClient();
 
@@ -75,17 +77,37 @@ const AppRoutes = () => (
         </RequireAuth>
       }
     />
-    {/* <Route
-      path="/book-ticket"
+    <Route
+      path="/register-parking"
       element={
         <RequireAuth>
-          <RequireRole allowedRoles={["ATTENDANT"]}>
-            <BookTicket />
+          <RequireRole allowedRoles={["ADMIN"]}>
+            <ParkingForm />
           </RequireRole>
         </RequireAuth>
       }
-    /> */}
-    {/* <Route
+    />
+    <Route
+      path="/car-entry"
+      element={
+        <RequireAuth>
+          <RequireRole allowedRoles={["ADMIN", "ATTENDANT"]}>
+            <CarEntryForm />
+          </RequireRole>
+        </RequireAuth>
+      }
+    />
+    <Route
+      path="/car-exit"
+      element={
+        <RequireAuth>
+          <RequireRole allowedRoles={["ADMIN", "ATTENDANT"]}>
+            <CarExitForm />
+          </RequireRole>
+        </RequireAuth>
+      }
+    />
+    <Route
       path="/entered-cars"
       element={
         <RequireAuth>
@@ -94,8 +116,8 @@ const AppRoutes = () => (
           </RequireRole>
         </RequireAuth>
       }
-    /> */}
-    {/* <Route
+    />
+    <Route
       path="/outgoing-cars"
       element={
         <RequireAuth>
@@ -104,8 +126,8 @@ const AppRoutes = () => (
           </RequireRole>
         </RequireAuth>
       }
-    /> */}
-    {/* <Route
+    />
+    <Route
       path="/users"
       element={
         <RequireAuth>
@@ -114,7 +136,7 @@ const AppRoutes = () => (
           </RequireRole>
         </RequireAuth>
       }
-    /> */}
+    />
 
     {/* Fallback */}
     <Route path="*" element={<NotFound />} />
@@ -124,7 +146,7 @@ const AppRoutes = () => (
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <BrowserRouter>
+      <Router>
         <AuthProvider>
           <ParkingProvider>
             {/* <TicketProvider> */}
@@ -134,7 +156,7 @@ const App = () => (
             {/* </TicketProvider> */}
           </ParkingProvider>
         </AuthProvider>
-      </BrowserRouter>
+      </Router>
     </TooltipProvider>
   </QueryClientProvider>
 );

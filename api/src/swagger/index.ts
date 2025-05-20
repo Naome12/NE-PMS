@@ -7,7 +7,7 @@ const doc = {
     description: 'API documentation for the parking management system',
     version: '1.0.0',
   },
-  host: 'localhost:5000',
+  host: 'localhost:4000',
   schemes: ['http'],
   basePath: "/api",
   consumes: ["application/json"],

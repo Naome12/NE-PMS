@@ -17,7 +17,7 @@ router.use('/auth', authRouter
 
 router.use('/park', parkingRouter
   /*
-    #swagger.tags = ['Parking Spots']
+    #swagger.tags = ['Parks']
     #swagger.security = [{
       "bearerAuth": []
     }]
@@ -26,7 +26,7 @@ router.use('/park', parkingRouter
 
 router.use('/car', carRouter
   /*    
-      #swagger.tags = ['Vehicle check-in/check-out']
+      #swagger.tags = ['Cars']
     #swagger.security = [{
       "bearerAuth": []
     }]
