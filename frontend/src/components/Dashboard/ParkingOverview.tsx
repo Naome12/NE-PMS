@@ -114,7 +114,7 @@ const AdminDashboard = () => {
                   <TableCell>{car.exitTime ? new Date(car.exitTime).toLocaleString() : '-'}</TableCell>
                   <TableCell>
                     {car.chargedAmount !== undefined && car.chargedAmount !== null
-                      ? `$${Number(car.chargedAmount).toFixed(2)}`
+                      ? `${Number(car.chargedAmount).toFixed(2) } RWF`
                       : '-'}
                   </TableCell>
                 </TableRow>

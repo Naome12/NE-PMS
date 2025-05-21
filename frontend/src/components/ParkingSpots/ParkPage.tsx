@@ -29,12 +29,7 @@ const ParkPage = () => {
                 <p className="text-sm text-gray-600">Location: {park.location}</p>
                 <p className="text-sm text-gray-600">Available Spaces: {park.availableSpaces}</p>
                 <p className="text-sm text-gray-600">Fee/hr: {park.feePerHour} RWF</p>
-                <Button
-                  className="mt-2"
-                  onClick={() => navigate(`/park/${park.code}`)}
-                >
-                  View Details
-                </Button>
+
               </CardContent>
             </Card>
           ))}
