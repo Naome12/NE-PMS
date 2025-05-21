@@ -56,6 +56,7 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
     try {
       const res = await api.get('/park/available');
       setAvailableParks(res.data);
+      console.log('Available parks:', res.data);
     } catch (error) {
       console.error('Failed to fetch available parks:', error);
     } finally {

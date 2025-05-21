@@ -21,7 +21,8 @@ import { toast } from "sonner";
 import api from "@/lib/lib";
 
 export const CarEntryForm = () => {
-  const { parks, refreshParks } = useParkingContext();
+  const { availableParks, refreshAvailableParks } = useParkingContext();
+  console.log('parks:', availableParks);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     plateNumber: "",
@@ -35,9 +36,10 @@ export const CarEntryForm = () => {
     try {
       await api.post("/car/register", formData);
       toast.success("Car entry registered successfully");
-      refreshParks();
+      refreshAvailableParks();
       setFormData({
-        plateNumber: "",
+        plateNumber: "",                                 
+
         parkingCode: "",
       });
     } catch (error) {
@@ -78,17 +80,17 @@ export const CarEntryForm = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="parkingCode">Parking Spot</Label>
+            <Label htmlFor="parkingCode">Parking</Label>
             <Select
               value={formData.parkingCode}
               onValueChange={handleParkingSelect}
               required
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select a parking spot" />
+                <SelectValue placeholder="Select a parking " />
               </SelectTrigger>
               <SelectContent>
-                {parks.map((park) => (
+                {availableParks.map((park) => (
                   <SelectItem key={park.code} value={park.code}>
                     {park.name} - {park.location}
                   </SelectItem>

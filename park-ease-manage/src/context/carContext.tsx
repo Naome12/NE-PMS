@@ -1,38 +1,59 @@
-// src/context/CarContext.tsx
+// context/CarContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import api from '@/lib/lib'; // your axios instance
-
-export interface Car {
-  id: string;
-  plateNumber: string;
-  parkingCode: string;
-  attendantId: string;
-  entryTime: string;
-  exitTime?: string;
-  chargedAmount?: number;
-}
+import api from '../lib/lib';
+import { Car } from '../types';
 
 interface CarContextType {
   cars: Car[];
+  enteredCars: Car[];
+  exitedCars: Car[];
   loading: boolean;
+  fetchCars: () => Promise<void>;
+  fetchParkedCars: () => Promise<void>;
+  fetchExitedCars: () => Promise<void>;
   registerEntry: (plateNumber: string, parkingCode: string) => Promise<void>;
   registerExit: (plateNumber: string) => Promise<{ chargedAmount: number; parkedDuration: string } | null>;
-  fetchCars: () => Promise<void>;
 }
 
 const CarContext = createContext<CarContextType | undefined>(undefined);
 
 export const CarProvider = ({ children }: { children: ReactNode }) => {
   const [cars, setCars] = useState<Car[]>([]);
+  const [enteredCars, setEnteredCars] = useState<Car[]>([]);
+  const [exitedCars, setExitedCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchCars = async () => {
     setLoading(true);
     try {
-      const res = await api.get<Car[]>('/cars'); // You need an endpoint to get all cars (or by attendant)
+      const res = await api.get<Car[]>('/car');
       setCars(res.data);
     } catch (error) {
       console.error('Error fetching cars:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchParkedCars = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get<Car[]>('/car/entered');
+      setEnteredCars(res.data);
+    } catch (error) {
+      console.error('Error fetching parked cars:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchExitedCars = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get<Car[]>('/car/outgoing');
+      setExitedCars(res.data);
+    } catch (error) {
+      console.error('Error fetching exited cars:', error);
     } finally {
       setLoading(false);
     }
@@ -42,7 +63,7 @@ export const CarProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       await api.post('/car/register', { plateNumber, parkingCode });
-      await fetchCars(); // refresh list
+      await fetchCars();
     } catch (error) {
       console.error('Error registering car entry:', error);
       throw error;
@@ -55,8 +76,8 @@ export const CarProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       const res = await api.post('/car/exit', { plateNumber });
-      await fetchCars(); // refresh list
-      return res.data.data; // { chargedAmount, parkedDuration }
+      await fetchCars();
+      return res.data.data;
     } catch (error) {
       console.error('Error registering car exit:', error);
       return null;
@@ -66,13 +87,25 @@ export const CarProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <CarContext.Provider value={{ cars, loading, registerEntry, registerExit, fetchCars }}>
+    <CarContext.Provider
+      value={{
+        cars,
+        enteredCars,
+        exitedCars,
+        loading,
+        fetchCars,
+        fetchParkedCars,
+        fetchExitedCars,
+        registerEntry,
+        registerExit,
+      }}
+    >
       {children}
     </CarContext.Provider>
   );
 };
 
-export const useCarContext = () => {
+export const useCarContext = (): CarContextType => {
   const context = useContext(CarContext);
   if (!context) {
     throw new Error('useCarContext must be used within a CarProvider');

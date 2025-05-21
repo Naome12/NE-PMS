@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
-import { prisma } from '../../prisma/client';
-import { RegisterCarEntrySchema } from '../dtos/car.dto';
-import { AuthRequest } from '../types/express';
+import { Request, Response } from "express";
+import { prisma } from "../../prisma/client";
+import { RegisterCarEntrySchema } from "../dtos/car.dto";
+import { AuthRequest } from "../types/express";
 
 export const registerCarEntry = async (req: AuthRequest, res: Response) => {
   const parsed = RegisterCarEntrySchema.safeParse(req.body);
@@ -13,7 +13,7 @@ export const registerCarEntry = async (req: AuthRequest, res: Response) => {
   const { plateNumber, parkingCode } = parsed.data;
 
   if (!req.user || !req.user.id) {
-    res.status(401).json({ message: 'Unauthorized: User not found in token' });
+    res.status(401).json({ message: "Unauthorized: User not found in token" });
     return;
   }
 
@@ -22,11 +22,11 @@ export const registerCarEntry = async (req: AuthRequest, res: Response) => {
   try {
     const park = await prisma.park.findUnique({ where: { code: parkingCode } });
     if (!park) {
-      res.status(404).json({ message: 'Park not found' });
+      res.status(404).json({ message: "Park not found" });
       return;
     }
     if (park.availableSpaces <= 0) {
-      res.status(400).json({ message: 'No available space' });
+      res.status(400).json({ message: "No available space" });
       return;
     }
 
@@ -52,35 +52,36 @@ export const registerCarEntry = async (req: AuthRequest, res: Response) => {
       where: { code: parkingCode },
       data: {
         availableSpaces: updatedAvailable,
-        status: updatedAvailable === 0 ? 'OCCUPIED' : 'RESERVED',
+        status: updatedAvailable === 0 ? "OCCUPIED" : "RESERVED",
       },
     });
 
-    // 🧾 Create entry report
+    //  Create entry report
     await prisma.report.create({
       data: {
         generatedById: attendantId,
         startRange: car.entryTime,
         endRange: car.entryTime,
-        type: 'ENTRIES',
+        type: "ENTRIES",
         totalCars: 1,
-        totalCharged: 0.00,
+        totalCharged: 0.0,
       },
     });
 
-    res.status(201).json({ message: 'Car entry registered successfully', carId: car.id });
+    res
+      .status(201)
+      .json({ message: "Car entry registered successfully", carId: car.id });
   } catch (err) {
-    console.error('Car Entry Error:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Car Entry Error:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 export const carExit = async (req: AuthRequest, res: Response) => {
   const { plateNumber } = req.body;
 
   if (!req.user || !req.user.id) {
-    res.status(401).json({ message: 'Unauthorized: User not found in token' });
+    res.status(401).json({ message: "Unauthorized: User not found in token" });
     return;
   }
 
@@ -91,22 +92,24 @@ export const carExit = async (req: AuthRequest, res: Response) => {
     });
 
     if (!car) {
-      res.status(404).json({ message: 'Car not found' });
+      res.status(404).json({ message: "Car not found" });
       return;
     }
 
     if (car.exitTime) {
-      res.status(400).json({ message: 'Car already exited' });
+      res.status(400).json({ message: "Car already exited" });
       return;
     }
 
     const now = new Date();
     const entryTime = new Date(car.entryTime);
     const durationMs = now.getTime() - entryTime.getTime();
-    const hours = Math.ceil(durationMs / (1000 * 60 * 60));
+
+    // Convert milliseconds to decimal hours
+    const hours = durationMs / (1000 * 60 * 60);
 
     const feePerHour = Number(car.park.feePerHour);
-    const totalFee = feePerHour * hours;
+    const totalFee = +(feePerHour * hours).toFixed(2);
 
     await prisma.car.update({
       where: { id: car.id },
@@ -117,10 +120,10 @@ export const carExit = async (req: AuthRequest, res: Response) => {
     });
 
     const newAvailableSpaces = car.park.availableSpaces + 1;
-    let newStatus: 'FREE' | 'RESERVED' | 'OCCUPIED' = 'RESERVED';
+    let newStatus: "FREE" | "RESERVED" | "OCCUPIED" = "RESERVED";
 
     if (newAvailableSpaces >= 5) {
-      newStatus = 'FREE';
+      newStatus = "FREE";
     }
 
     await prisma.park.update({
@@ -131,38 +134,36 @@ export const carExit = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    // 🧾 Create exit report
+    //  Create exit report
     await prisma.report.create({
       data: {
         generatedById: req.user.id,
         startRange: now,
         endRange: now,
-        type: 'EXITS',
+        type: "EXITS",
         totalCars: 1,
         totalCharged: totalFee,
       },
     });
 
     res.status(200).json({
-      message: 'Car exit recorded',
+      message: "Car exit recorded",
       data: {
         plateNumber: car.plateNumber,
         parkedDuration: `${hours} hour(s)`,
         chargedAmount: totalFee,
       },
     });
-
   } catch (error) {
-    console.error('Car Exit Error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Car Exit Error:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 export const getAllCars = async (req: Request, res: Response) => {
   try {
     const cars = await prisma.car.findMany({
-      orderBy: { entryTime: 'desc' },
+      orderBy: { entryTime: "desc" },
       include: {
         attendant: {
           select: {
@@ -182,7 +183,35 @@ export const getAllCars = async (req: Request, res: Response) => {
 
     res.status(200).json({ total: cars.length, data: cars });
   } catch (error) {
-    console.error('Error fetching cars:', error);
-    res.status(500).json({ message: 'Failed to fetch cars' });
+    console.error("Error fetching cars:", error);
+    res.status(500).json({ message: "Failed to fetch cars" });
+  }
+};
+
+export const getCarsStillParked = async (req: Request, res: Response) => {
+  try {
+    const cars = await prisma.car.findMany({
+      where: {
+        exitTime: null,
+      },
+    });
+    res.json(cars);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch still-parked cars" });
+  }
+};
+
+export const getExitedCars = async (req: Request, res: Response) => {
+  try {
+    const cars = await prisma.car.findMany({
+      where: {
+        NOT: {
+          exitTime: null,
+        },
+      },
+    });
+    res.json(cars);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch exited cars" });
   }
 };

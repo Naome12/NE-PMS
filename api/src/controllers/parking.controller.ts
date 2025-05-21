@@ -58,9 +58,6 @@ export const registerPark = async (req: AuthRequest, res: Response): Promise<voi
 export const getParks = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const parks = await prisma.park.findMany({
-      where: {
-        ownerId: req.user?.id,
-      },
       select: {
         code: true,
         name: true,

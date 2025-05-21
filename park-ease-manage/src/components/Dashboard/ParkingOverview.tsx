@@ -1,99 +1,146 @@
 // src/pages/AdminDashboard.tsx
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useParkingContext } from '@/context/ParkingContext';
-import api from '@/lib/lib';
-import { User } from '@/types';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Card, CardContent, CardHeader, CardTitle
+} from '@/components/ui/card';
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow
+} from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { useParkingContext } from '@/context/ParkingContext';
+import { useCarContext } from '@/context/carContext';
 
-const PAGE_SIZE = 5;
+const ITEMS_PER_PAGE = 5;
 
 const AdminDashboard = () => {
   const { parks, refreshParks } = useParkingContext();
-  const [users, setUsers] = useState<User[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const { enteredCars, exitedCars, fetchParkedCars, fetchExitedCars } = useCarContext();
 
-  const fetchUsers = async () => {
-    try {
-      const res = await api.get('/auth/attendants');
-      setUsers(res.data.attendants);
-      setTotalPages(Math.ceil(res.data.attendants.length / PAGE_SIZE));
-    } catch (error) {
-      console.error('Failed to fetch users:', error);
-    }
-  };
+  const [enteredPage, setEnteredPage] = useState(1);
+  const [exitedPage, setExitedPage] = useState(1);
 
   useEffect(() => {
     refreshParks();
-    fetchUsers();
+    fetchParkedCars();
+    fetchExitedCars();
   }, []);
 
   const totalSpots = parks.length;
-  const freeSpots = parks.filter((p) => p.status === 'FREE').length;
-  const occupiedSpots = parks.filter((p) => p.status === 'OCCUPIED').length;
-  const reservedSpots = parks.filter((p) => p.status === 'RESERVED').length;
-  const occupancyRate = totalSpots > 0 ? ((occupiedSpots / totalSpots) * 100).toFixed(1) : '0';
 
-  const startIdx = (currentPage - 1) * PAGE_SIZE;
-  const currentUsers = users.slice(startIdx, startIdx + PAGE_SIZE);
+  // Pagination logic
+  const paginate = (data: any[], page: number) =>
+    data.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+
+  const totalEnteredPages = Math.ceil(enteredCars.length / ITEMS_PER_PAGE);
+  const totalExitedPages = Math.ceil(exitedCars.length / ITEMS_PER_PAGE);
+
+  const paginatedEnteredCars = paginate(enteredCars, enteredPage);
+  const paginatedExitedCars = paginate(exitedCars, exitedPage);
 
   return (
     <div className="space-y-8 p-4">
+      {/* Summary Card */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium">Total Parking Spots</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{totalSpots}</div>
-          <p className="text-xs text-muted-foreground">
-            {freeSpots} FREE, {occupiedSpots} OCCUPIED, {reservedSpots} RESERVED
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">{occupancyRate}% occupancy rate</p>
         </CardContent>
       </Card>
 
-      <div>
-        <h2 className="text-xl font-bold mb-4">Attendants</h2>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>First Name</TableHead>
-              <TableHead>Last Name</TableHead>
-              <TableHead>Email</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {currentUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.firstName} </TableCell>
-                <TableCell>{user.lastName}</TableCell>
-                <TableCell>{user.email}</TableCell>
+      {/* Tables */}
+      <div className="flex flex-col lg:flex-row gap-4">
+        {/* Parked Cars Table */}
+        <div className="flex-1">
+          <h2 className="text-lg font-semibold mb-2">Parked Cars</h2>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Plate Number</TableHead>
+                <TableHead>Parking Code</TableHead>
+                <TableHead>Entry Time</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {paginatedEnteredCars.map((car) => (
+                <TableRow key={car.id}>
+                  <TableCell>{car.plateNumber}</TableCell>
+                  <TableCell>{car.parkingCode}</TableCell>
+                  <TableCell>{new Date(car.entryTime).toLocaleString()}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          {/* Pagination controls */}
+          <div className="flex justify-between mt-2">
+            <Button
+              variant="outline"
+              onClick={() => setEnteredPage((prev) => Math.max(prev - 1, 1))}
+              disabled={enteredPage === 1}
+            >
+              Previous
+            </Button>
+            <span className="text-sm px-2">
+              Page {enteredPage} of {totalEnteredPages}
+            </span>
+            <Button
+              variant="outline"
+              onClick={() => setEnteredPage((prev) => Math.min(prev + 1, totalEnteredPages))}
+              disabled={enteredPage === totalEnteredPages}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
 
-        {/* Pagination Controls */}
-        <div className="flex justify-between items-center mt-4">
-          <Button
-            variant="outline"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
-          >
-            Previous
-          </Button>
-          <span className="text-sm text-muted-foreground">
-            Page {currentPage} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-          >
-            Next
-          </Button>
+        {/* Exited Cars Table */}
+        <div className="flex-1">
+          <h2 className="text-lg font-semibold mb-2">Exited Cars</h2>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Plate Number</TableHead>
+                <TableHead>Entry Time</TableHead>
+                <TableHead>Exit Time</TableHead>
+                <TableHead>Charged</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedExitedCars.map((car) => (
+                <TableRow key={car.id}>
+                  <TableCell>{car.plateNumber}</TableCell>
+                  <TableCell>{car.entryTime ? new Date(car.entryTime).toLocaleString() : '-'}</TableCell>
+                  <TableCell>{car.exitTime ? new Date(car.exitTime).toLocaleString() : '-'}</TableCell>
+                  <TableCell>
+                    {car.chargedAmount !== undefined && car.chargedAmount !== null
+                      ? `$${Number(car.chargedAmount).toFixed(2)}`
+                      : '-'}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          {/* Pagination controls */}
+          <div className="flex justify-between mt-2">
+            <Button
+              variant="outline"
+              onClick={() => setExitedPage((prev) => Math.max(prev - 1, 1))}
+              disabled={exitedPage === 1}
+            >
+              Previous
+            </Button>
+            <span className="text-sm px-2">
+              Page {exitedPage} of {totalExitedPages}
+            </span>
+            <Button
+              variant="outline"
+              onClick={() => setExitedPage((prev) => Math.min(prev + 1, totalExitedPages))}
+              disabled={exitedPage === totalExitedPages}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
     </div>
