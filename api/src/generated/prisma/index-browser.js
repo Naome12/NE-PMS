@@ -158,17 +158,6 @@ exports.Prisma.TicketScalarFieldEnum = {
   attendantId: 'attendantId'
 };
 
-exports.Prisma.ReportScalarFieldEnum = {
-  id: 'id',
-  generatedAt: 'generatedAt',
-  startRange: 'startRange',
-  endRange: 'endRange',
-  type: 'type',
-  totalCars: 'totalCars',
-  totalCharged: 'totalCharged',
-  generatedById: 'generatedById'
-};
-
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -194,17 +183,11 @@ exports.ParkStatus = exports.$Enums.ParkStatus = {
   RESERVED: 'RESERVED'
 };
 
-exports.ReportType = exports.$Enums.ReportType = {
-  ENTRIES: 'ENTRIES',
-  EXITS: 'EXITS'
-};
-
 exports.Prisma.ModelName = {
   User: 'User',
   Park: 'Park',
   Car: 'Car',
-  Ticket: 'Ticket',
-  Report: 'Report'
+  Ticket: 'Ticket'
 };
 
 /**

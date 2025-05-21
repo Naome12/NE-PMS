@@ -36,7 +36,6 @@ model User {
   parks       Park[]    @relation("ParkOwner")
   cars        Car[]     @relation("CarAttendant")
   tickets     Ticket[]  @relation("TicketAttendant")
-  reports     Report[]  // 👈 New relation
 }
 
 model Park {
@@ -85,17 +84,4 @@ model Ticket {
   attendant    User      @relation("TicketAttendant", fields: [attendantId], references: [id])
 }
 
-model Report {
-  id             String      @id @default(uuid())
-  generatedAt    DateTime    @default(now())
 
-  startRange     DateTime
-  endRange       DateTime
-  type           ReportType
-
-  totalCars      Int
-  totalCharged   Decimal     @default(0.00) @db.Decimal(10,2)
-
-  generatedById  String
-  generatedBy    User        @relation(fields: [generatedById], references: [id])
-}

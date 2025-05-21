@@ -56,18 +56,6 @@ export const registerCarEntry = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    //  Create entry report
-    await prisma.report.create({
-      data: {
-        generatedById: attendantId,
-        startRange: car.entryTime,
-        endRange: car.entryTime,
-        type: "ENTRIES",
-        totalCars: 1,
-        totalCharged: 0.0,
-      },
-    });
-
     res
       .status(201)
       .json({ message: "Car entry registered successfully", carId: car.id });
@@ -134,17 +122,6 @@ export const carExit = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    //  Create exit report
-    await prisma.report.create({
-      data: {
-        generatedById: req.user.id,
-        startRange: now,
-        endRange: now,
-        type: "EXITS",
-        totalCars: 1,
-        totalCharged: totalFee,
-      },
-    });
 
     res.status(200).json({
       message: "Car exit recorded",
